@@ -408,7 +408,7 @@ $('tzPrev').addEventListener('click',()=>{ if(!busy) go(cur-1); });
 const cont=$('container'), bearsEl=$('bears');
 let drag=null;
 cont.addEventListener('pointerdown',e=>{
-  if(busy || e.target.closest('.card') || (e.pointerType==='mouse' && e.button!==0)) return;
+  if(busy || (e.pointerType==='mouse' && e.button!==0)) return;
   drag={x:e.clientX,y:e.clientY,id:e.pointerId,dx:0,axis:null};
 });
 cont.addEventListener('pointermove',e=>{
