@@ -202,6 +202,18 @@ html.drawn .homebar{display:block}
 .switcher{transition:transform .5s cubic-bezier(.2,.8,.2,1)}
 html.intro-on .switcher{transform:translateY(110%)}
 @media (min-width:640px) and (min-height:720px){ html.intro-on .switcher{transform:translateY(30px);opacity:0} .switcher{transition:transform .5s,opacity .5s} }
+
+/* ---------- Модальное окно после автопоказа ---------- */
+.modal{position:absolute;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;padding:0 32px;background:rgba(5,5,5,.42);
+  opacity:0;pointer-events:none;transition:opacity .3s ease;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.modal.on{opacity:1;pointer-events:auto}
+.modal .box{width:100%;max-width:326px;background:#fff;border-radius:28px;padding:28px 24px 20px;text-align:center;
+  box-shadow:0 24px 60px rgba(0,0,0,.25);transform:scale(.88) translateY(12px);transition:transform .45s cubic-bezier(.3,1.4,.5,1)}
+.modal.on .box{transform:none}
+.modal .ic{width:56px;height:56px;margin:0 auto 16px;border-radius:50%;background:linear-gradient(to bottom,#ffc1e2,#ff62b6);display:flex;align-items:center;justify-content:center}
+.modal p{font-size:20px;line-height:1.25;font-weight:600;color:var(--black);margin:0 0 22px;letter-spacing:-.01em}
+.modal button{display:block;width:100%;height:52px;border-radius:100px;background:var(--pink);color:#fff;font-size:17px;font-weight:600}
+.modal button:active{transform:scale(.97)}
 @media (prefers-reduced-motion:reduce){*{transition-duration:.01s!important;animation:none!important}}
 </style>
 </head>
@@ -212,6 +224,13 @@ html.intro-on .switcher{transform:translateY(110%)}
 <div class="stage">
   <div class="viewport" id="viewport">
     <div class="app" id="app">
+      <div class="modal" id="doneModal" role="dialog" aria-modal="true" aria-labelledby="doneText">
+        <div class="box">
+          <div class="ic"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
+          <p id="doneText">Теперь вы можете управлять интерфейсом</p>
+          <button id="doneOk">ОК</button>
+        </div>
+      </div>
       <div class="container" id="container">
         <div class="bg bg-0"></div><div class="bg bg-1"></div><div class="bg bg-2"></div><div class="bg bg-3"></div><div class="bg bg-4"></div>
         <div class="bears" id="bears"></div>
@@ -471,7 +490,9 @@ async function playProgress(){
   }
   busy=false;
   mode=2; open=[true,true,true,true,true]; render(false);
+  setTimeout(()=>{ if(id===runId) $('doneModal').classList.add('on'); },350);
 }
+$('doneOk').addEventListener('click',()=>$('doneModal').classList.remove('on'));
 
 /* ---------- Переключатель состояний ---------- */
 function setMode(m){
