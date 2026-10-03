@@ -194,9 +194,9 @@ html.drawn .homebar{display:block}
 .share{display:inline-block;vertical-align:-3px;width:16px;height:18px}
 
 /* ---------- Прелоадер-видео ---------- */
-#intro{position:fixed;inset:0;z-index:100;background:#f6f5f8;transition:opacity .5s ease}
+#intro{position:fixed;inset:0;z-index:100;background:#fff;transition:opacity .5s ease}
 #intro.done{opacity:0;pointer-events:none}
-#intro video{position:absolute;left:0;top:0;width:100%;height:100%;object-fit:cover;background:#f6f5f8}
+#intro video{position:absolute;left:0;top:0;width:100%;height:100%;object-fit:contain;background:#fff}
 #intro .skip{position:absolute;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));font:500 13px/1 -apple-system,"Inter",sans-serif;color:rgba(5,5,5,.45);padding:10px 14px;border-radius:100px;background:rgba(255,255,255,.7);opacity:0;transition:opacity .4s .8s}
 #intro.playing .skip{opacity:1}
 .switcher{transition:transform .5s cubic-bezier(.2,.8,.2,1)}
@@ -534,18 +534,14 @@ const intro=$('intro'), vid=$('introVid');
 function afterIntro(f){ introDone?f():introCbs.push(f); }
 window.afterIntro=afterIntro;
 root.classList.add('intro-on');
-let landed=false;
 function placeIntro(){
-  if(framedMQ.matches){
-    const r=vp.getBoundingClientRect();
-    if(landed){ Object.assign(vid.style,{left:r.left+'px',top:r.top+'px',width:r.width+'px',height:r.height+'px',borderRadius:'48px',webkitMaskImage:'none',maskImage:'none'}); return; }
-    // во время ролика — во всю высоту окна, края растворяются в фоне
-    const h=innerHeight, w=h*390/844;
-    const m='linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent)';
-    Object.assign(vid.style,{left:(innerWidth-w)/2+'px',top:'0px',width:w+'px',height:h+'px',borderRadius:'0',webkitMaskImage:m,maskImage:m});
-  } else Object.assign(vid.style,{left:'0',top:'0',width:'100%',height:'100%',borderRadius:'0',webkitMaskImage:'none',maskImage:'none'});
+  // ролик 3:4 — по центру на белом фоне, края растворяются
+  const W=innerWidth, H=innerHeight, framed=framedMQ.matches;
+  let w=W, h=W*4/3;
+  if(framed || h>H){ h=Math.min(H*(framed?.86:1), H); w=h*3/4; if(w>W){ w=W; h=w*4/3; } }
+  Object.assign(vid.style,{left:(W-w)/2+'px',top:(H-h)/2+'px',width:w+'px',height:h+'px',objectFit:'cover',
+    borderRadius:framed?'22px':'0',boxShadow:framed?'0 30px 80px -30px rgba(40,25,30,.35)':'none'});
 }
-function land(){ if(landed) return; landed=true; vid.style.transition='left .9s cubic-bezier(.65,0,.35,1),top .9s cubic-bezier(.65,0,.35,1),width .9s cubic-bezier(.65,0,.35,1),height .9s cubic-bezier(.65,0,.35,1),border-radius .9s'; placeIntro(); }
 function finishIntro(){
   if(introDone) return; introDone=true;
   intro.classList.add('done'); root.classList.remove('intro-on');
@@ -554,13 +550,13 @@ function finishIntro(){
 }
 addEventListener('resize',placeIntro);
 vid.addEventListener('ended',finishIntro);
-vid.addEventListener('timeupdate',()=>{ if(vid.currentTime>=2.95 && framedMQ.matches) land(); if(vid.duration && vid.currentTime>=vid.duration-0.06) finishIntro(); });
+vid.addEventListener('timeupdate',()=>{ if(vid.duration && vid.currentTime>=vid.duration-0.06) finishIntro(); });
 vid.addEventListener('playing',()=>intro.classList.add('playing'));
 vid.addEventListener('error',finishIntro,true);
 $('introSkip').addEventListener('click',finishIntro);
 const tryPlay=vid.play(); if(tryPlay&&tryPlay.catch) tryPlay.catch(()=>{ setTimeout(finishIntro,300); });
 setTimeout(()=>{ if(!introDone && vid.currentTime===0) finishIntro(); },3000);   // если видео не стартовало
-setTimeout(finishIntro,7000);                                                      // страховка
+setTimeout(finishIntro,10000);                                                      // страховка
 
 fit(); render(false); placeIntro();
 })();
