@@ -60,7 +60,7 @@ img{display:block;max-width:none;-webkit-user-drag:none;pointer-events:none}
 .bg-2{background:linear-gradient(to bottom,#ffe187,#e2b327 64.738%)}
 .bg-3{background:linear-gradient(to bottom,#ebebeb,#1c1c1c 65.509%)}
 .bg-4{background:#050505}
-.bears{position:absolute;left:0;bottom:0;width:390px;height:648px}
+.bears{position:absolute;left:0;bottom:0;width:390px;height:648px;z-index:0}
 .slot{position:absolute;left:11.5px;top:70px;width:367px;height:367px;transition:transform .6s cubic-bezier(.65,0,.35,1),opacity .6s ease;will-change:transform}
 .slot .lay{position:absolute;inset:0;transition:opacity .45s ease}
 .slot .skin{position:absolute;inset:0;width:367px;height:367px}
@@ -75,7 +75,7 @@ img{display:block;max-width:none;-webkit-user-drag:none;pointer-events:none}
 .slot .space-lock .sub{position:absolute;left:26.89px;top:44px;width:313px;height:322px}
 .slot.reveal .skin-lay{animation:reveal 1s ease}
 @keyframes reveal{0%{filter:brightness(3) saturate(0);opacity:0}60%{filter:brightness(1.6)}100%{filter:none;opacity:1}}
-.fade{position:absolute;left:0;right:0;bottom:0;height:297px;transition:opacity .55s ease,height .55s cubic-bezier(.4,0,.2,1)}
+.fade{position:absolute;z-index:1;pointer-events:none;left:0;right:0;bottom:0;height:297px;transition:opacity .55s ease,height .55s cubic-bezier(.4,0,.2,1)}
 .collapsed .fade{height:335px}
 .fade-0{background:linear-gradient(to bottom,rgba(255,98,182,0),#ff62b6 23.784%)}
 .fade-1{background:linear-gradient(to bottom,rgba(190,190,190,0),#bebebe 23.784%)}
