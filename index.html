@@ -542,18 +542,40 @@ function placeIntro(){
   Object.assign(vid.style,{left:(W-w)/2+'px',top:(H-h)/2+'px',width:w+'px',height:h+'px',objectFit:'cover',
     borderRadius:framed?'22px':'0',boxShadow:framed?'0 30px 80px -30px rgba(40,25,30,.35)':'none'});
 }
-function finishIntro(){
+// экран мокапа в последнем кадре ролика (координаты кадра 450×600)
+const FIN={x:115.8,y:63.68,w:218.4,h:472.64,r:28.56};
+function finishIntro(morph){
   if(introDone) return; introDone=true;
-  intro.classList.add('done'); root.classList.remove('intro-on');
-  setTimeout(()=>{ intro.remove(); },600);
-  introCbs.splice(0).forEach(f=>f());
+  root.classList.remove('intro-on');
+  const done=()=>{ intro.classList.add('done'); setTimeout(()=>intro.remove(),600); };
+  if(morph===true){
+    // остаётся только экран мокапа — он плавно вырастает до размера прототипа и растворяется в нём
+    const L=parseFloat(vid.style.left), T=parseFloat(vid.style.top), W=parseFloat(vid.style.width), f=W/450;
+    const sx=FIN.x*f, sy=FIN.y*f, sw=FIN.w*f, sh=FIN.h*f;
+    const tr=vp.getBoundingClientRect(), m=tr.width/sw;
+    const tx=tr.left-L-m*sx, ty=tr.top-T-m*sy;
+    const H=parseFloat(vid.style.height);
+    vid.style.boxShadow='none'; $('introSkip').style.display='none';
+    vid.style.clipPath=`inset(0px 0px 0px 0px round ${framedMQ.matches?22:0}px)`;
+    intro.style.transition='background-color .35s ease 1.0s';
+    requestAnimationFrame(()=>{
+      vid.style.transition='clip-path .55s cubic-bezier(.4,0,.2,1), transform .85s cubic-bezier(.65,0,.35,1) .25s, opacity .35s ease 1.05s';
+      vid.style.clipPath=`inset(${sy}px ${W-sx-sw}px ${H-sy-sh}px ${sx}px round ${FIN.r*f}px)`;
+      vid.style.transformOrigin='0 0';
+      vid.style.transform=`translate(${tx}px,${ty}px) scale(${m})`;
+      intro.style.backgroundColor='rgba(255,255,255,0)';
+      vid.style.opacity='0';
+    });
+    setTimeout(()=>{ intro.remove(); },1550);
+  } else done();
+  introCbs.splice(0).forEach(f=>setTimeout(f, morph===true?1500:0));
 }
 addEventListener('resize',placeIntro);
-vid.addEventListener('ended',finishIntro);
-vid.addEventListener('timeupdate',()=>{ if(vid.duration && vid.currentTime>=vid.duration-0.06) finishIntro(); });
+vid.addEventListener('ended',()=>finishIntro(true));
+vid.addEventListener('timeupdate',()=>{ if(vid.duration && vid.currentTime>=vid.duration-0.04) finishIntro(true); });
 vid.addEventListener('playing',()=>intro.classList.add('playing'));
 vid.addEventListener('error',finishIntro,true);
-$('introSkip').addEventListener('click',finishIntro);
+$('introSkip').addEventListener('click',()=>finishIntro(false));
 const tryPlay=vid.play(); if(tryPlay&&tryPlay.catch) tryPlay.catch(()=>{ setTimeout(finishIntro,300); });
 setTimeout(()=>{ if(!introDone && vid.currentTime===0) finishIntro(); },3000);   // если видео не стартовало
 setTimeout(finishIntro,10000);                                                      // страховка
