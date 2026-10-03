@@ -112,8 +112,10 @@ img{display:block;max-width:none;-webkit-user-drag:none;pointer-events:none}
 .pts .maxed{font-size:16px;color:var(--pink)}
 .swap{transition:opacity .25s ease,transform .25s ease}
 .swap.out{opacity:0;transform:translateY(4px)}
-.tabs{display:flex;gap:8px}
-.tab{position:relative;flex:1;min-width:0;height:43px;border-radius:1000px;transition:transform .15s}
+.tabs{display:flex;align-items:center;gap:2px}
+.tabs .link{flex:none;width:7px;height:1px;background:#050505;opacity:.14}
+.tab{position:relative;flex:none;width:58px;height:43px;border-radius:1000px;box-shadow:0 0 0 1px rgba(0,0,0,.1);transition:transform .15s,box-shadow .4s ease}
+.tab.open{box-shadow:0 0 0 1px rgba(0,0,0,0)}
 .tab:active{transform:scale(.94)}
 .tab .fill{position:absolute;inset:0;border-radius:1000px;opacity:0;transition:opacity .4s ease}
 .tab.open .fill{opacity:1}
@@ -335,6 +337,7 @@ for(let i=0;i<5;i++){
   const t=document.createElement('button'); t.className='tab'; t.setAttribute('aria-label',NAMES[i]);
   t.innerHTML=`<span class="fill f${i}"></span><span class="ic"><img class="off" src="${A.bearOff}" alt=""><img class="on" src="${A.bearOn}" alt=""></span><span class="sel"></span>`;
   t.addEventListener('click',()=>{ if(!busy) go(i); });
+  if(i>0){ const l=document.createElement('span'); l.className='link'; tabsEl.appendChild(l); }
   tabsEl.appendChild(t); tabs.push(t);
 }
 const list=$('list'), rcards=[];
